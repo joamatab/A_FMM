@@ -25,16 +25,14 @@ class Creator:
         self.y_list = [-0.5, -0.5 * h, -0.5 * h + t, 0.5 * h]
         self.eps_lists = [[eps_uc, eps_lc, eps_core, eps_uc]]
         eps = [eps_uc, eps_core]
-        for i in Z:
-            self.eps_lists.append([eps_uc, eps_lc, eps_core, eps[i]])
+        self.eps_lists.extend([eps_uc, eps_lc, eps_core, eps[i]] for i in Z)
 
     def slow_2D(self, eps_core, eps_c, w, Z):
         self.x_list = np.linspace(-0.5 * w, 0.5 * w, len(Z) + 1)
         self.y_list = [-0.5]
         self.eps_lists = [[eps_c]]
         eps = [eps_c, eps_core]
-        for i in Z:
-            self.eps_lists.append([eps[i]])
+        self.eps_lists.extend([eps[i]] for i in Z)
 
     def ridge(self, eps_core, eps_lc, eps_uc, w, h, t=0.0, y_offset=0.0, x_offset=0.0):
         """Rib waveguide with single layer
@@ -183,8 +181,7 @@ class Creator:
         self.y_list = [0.5]
         self.x_list = [-0.5] + x_l
         self.eps_lists = [[eps_l[-1]]]
-        for eps in eps_l:
-            self.eps_lists.append([eps])
+        self.eps_lists.extend([eps] for eps in eps_l)
 
     def hole(self, h, w, r, e_core, e_lc, e_up, e_fill):
         """Rib waveguide with a hole in the middle
@@ -251,8 +248,8 @@ class Creator:
         self.eps_lists = [eps2, eps1]
 
     def varied_epi(self, eps_back, data_list, y_off=0.0):
-        t_tot = sum([dd[2] for dd in data_list])
-        w_list = np.sort(list(set([0.5 * dd[1] for dd in data_list])))
+        t_tot = sum(dd[2] for dd in data_list)
+        w_list = np.sort(list({0.5 * dd[1] for dd in data_list}))
         self.x_list = [-0.5] + list(-w_list[::-1]) + list(w_list)
         self.y_list = [-0.5 * t_tot] + list(
             -0.5 * t_tot + np.cumsum([dd[2] for dd in data_list])
@@ -262,9 +259,7 @@ class Creator:
         for pos in self.x_list:
             eps_list = [eps_back]
             for eps, w, t in data_list:
-                if pos < -0.5 * w:
-                    eps_list.append(eps_back)
-                elif pos >= 0.5 * w:
+                if pos < -0.5 * w or pos >= 0.5 * w:
                     eps_list.append(eps_back)
                 else:
                     eps_list.append(eps)
@@ -272,12 +267,12 @@ class Creator:
 
     def varied_plane(self, eps_back, t, data_list):
         self.y_list = [-0.5 * t, 0.5 * t]
-        w_tot = sum([dd[1] for dd in data_list])
+        w_tot = sum(dd[1] for dd in data_list)
         self.x_list = [-0.5 * w_tot] + list(
             -0.5 * w_tot + np.cumsum([dd[1] for dd in data_list])
         )
         self.eps_lists = [len(self.y_list) * [eps_back]]
-        for i, (eps, w) in enumerate(data_list):
+        for eps, w in data_list:
             eps_list = [eps_back, eps]
             self.eps_lists.append(eps_list)
 
