@@ -34,19 +34,17 @@ st.count_interface()                                   #Calling count_interface,
 st.transform(ex=0.8)                                   #Setting the coordinate transform (in unit of cell)
 st.plot_stack()                                        #Plotting stack epsilon
 
-f=open('bands.out','w')
-kb=[]
-for k0 in k0_l:                                        #loop over wavevectors
-    st.solve(k0)                                       #Create the scattering matirx of structure
-    BK=st.bloch_modes()                                #Solve for bloch modes (function return array of block vectors)
-    f.write('%10.5f' % (k0))                           #writing data to output file
-    for k in BK:
-        f.write('%10.5f' % (k.real))
-    f.write('\n')
-    print(2*'%15.8f' % (k0,max(BK)))                   #writing mode with maximum bloch vector
-    kb.append(max(BK).real*st.tot_thick/np.pi)         #saving normalized block vector
-f.close()
-
+with open('bands.out','w') as f:
+    kb=[]
+    for k0 in k0_l:                                        #loop over wavevectors
+        st.solve(k0)                                       #Create the scattering matirx of structure
+        BK=st.bloch_modes()                                #Solve for bloch modes (function return array of block vectors)
+        f.write('%10.5f' % (k0))                           #writing data to output file
+        for k in BK:
+            f.write('%10.5f' % (k.real))
+        f.write('\n')
+        print(2*'%15.8f' % (k0,max(BK)))                   #writing mode with maximum bloch vector
+        kb.append(max(BK).real*st.tot_thick/np.pi)         #saving normalized block vector
 quit()
 #possible part for fit
 def func(x,om,n,U):                                    #defining fitting function

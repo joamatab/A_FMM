@@ -105,13 +105,13 @@ class Stack:
         self.tot_thick = sum(self.d)
         self.lay_list = []
         for lay in self.layers:
-            if not lay in self.lay_list:
+            if lay not in self.lay_list:
                 self.lay_list.append(lay)
         self.int_list = []
         self.interfaces = []
         for i in range(self.N - 1):
             T_inter = (self.layers[i], self.layers[i + 1])
-            if not T_inter in self.int_list:
+            if T_inter not in self.int_list:
                 self.int_list.append(T_inter)
             self.interfaces.append(T_inter)
 
@@ -136,8 +136,7 @@ class Stack:
         self.layers[0].get_P_norm()
         self.layers[-1].get_P_norm()
         self.int_matrices = []
-        for i in self.int_list:
-            self.int_matrices.append(i[0].interface(i[1]))
+        self.int_matrices.extend(i[0].interface(i[1]) for i in self.int_list)
         self.S = copy.deepcopy(self.int_matrices[0])
         for i in range(1, self.N - 1):
             self.S.add_uniform(self.layers[i], self.d[i])
@@ -200,8 +199,7 @@ class Stack:
 
         """
         self.int_matrices = []
-        for i in self.int_list:
-            self.int_matrices.append(i[0].interface(i[1]))
+        self.int_matrices.extend(i[0].interface(i[1]) for i in self.int_list)
         self.S = copy.deepcopy(self.int_matrices[0])
         for i in range(1, self.N - 1):
             self.S.add_uniform(self.layers[i], self.d[i])
@@ -305,9 +303,8 @@ class Stack:
         if d != None:
             d2 = d
         (u2, d1) = self.S.output(u1, d2)
-        dic = {}
         P = self.layers[0].get_Poynting(u1, d1)
-        dic["left"] = (u1, d1, P)
+        dic = {"left": (u1, d1, P)}
         P = self.layers[-1].get_Poynting(u2, d2)
         dic["right"] = (u2, d2, P)
         return dic

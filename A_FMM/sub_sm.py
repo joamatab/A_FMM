@@ -37,45 +37,35 @@ def createG(Ng1, Ng2):
 def inter_(n, x_list, eps_list):
     if n == 0:
         return eps_list[0] + sum(
-            [
-                -(eps_list[(j + 1) % len(eps_list)] - eps_list[j]) * x_list[j]
-                for j in range(len(x_list))
-            ]
+            -(eps_list[(j + 1) % len(eps_list)] - eps_list[j]) * x_list[j]
+            for j in range(len(x_list))
         )
     else:
         return sum(
-            [
-                (eps_list[(j + 1) % len(eps_list)] - eps_list[j])
-                * np.exp(-(0 + 2j) * np.pi * n * x_list[j])
-                for j in range(len(x_list))
-            ]
+            (eps_list[(j + 1) % len(eps_list)] - eps_list[j])
+            * np.exp(-(0 + 2j) * np.pi * n * x_list[j])
+            for j in range(len(x_list))
         ) / ((0 + 2j) * np.pi * n)
 
 
 def inter_v(n, x_list, eps_list):
     if n == 0:
         return 1.0 / eps_list[0] + sum(
-            [
-                -(1.0 / eps_list[(j + 1) % len(eps_list)] - 1.0 / eps_list[j])
-                * x_list[j]
-                for j in range(len(x_list))
-            ]
+            -(1.0 / eps_list[(j + 1) % len(eps_list)] - 1.0 / eps_list[j])
+            * x_list[j]
+            for j in range(len(x_list))
         )
     else:
         return sum(
-            [
-                (1.0 / eps_list[(j + 1) % len(eps_list)] - 1.0 / eps_list[j])
-                * np.exp(-(0 + 2j) * np.pi * n * x_list[j])
-                for j in range(len(x_list))
-            ]
+            (1.0 / eps_list[(j + 1) % len(eps_list)] - 1.0 / eps_list[j])
+            * np.exp(-(0 + 2j) * np.pi * n * x_list[j])
+            for j in range(len(x_list))
         ) / ((0 + 2j) * np.pi * n)
 
 
 def fou(nx, ny, x_list, y_list, eps_lists):
     N = len(x_list)
-    f = []
-    for i in range(N):
-        f.append(inter_(ny, y_list, eps_lists[i]))
+    f = [inter_(ny, y_list, eps_lists[i]) for i in range(N)]
     return (1 + 0j) * inter_(nx, x_list, f)
 
 
@@ -92,24 +82,24 @@ def create_epsilon(G, x_list, y_list, eps_lists):
 
 def fou_v(nx, ny, x_list, y_list, eps_lists):
     N = len(x_list)
-    f = []
-    for i in range(N):
-        f.append(inter_v(ny, y_list, eps_lists[i]))
+    f = [inter_v(ny, y_list, eps_lists[i]) for i in range(N)]
     return (1 + 0j) * inter_(nx, x_list, f)
 
 
 def fou_yx(Nx, Ny, G, x_list, y_list, eps_lists):
-    f = []
     D = len(G)
     nx = len(x_list)
-    for i in range(nx):
-        f.append(
-            linalg.inv(
-                linalg.toeplitz(
-                    [inter_v(j + Ny, y_list, eps_lists[i]) for j in range(-Ny, Ny + 1)]
-                )
+    f = [
+        linalg.inv(
+            linalg.toeplitz(
+                [
+                    inter_v(j + Ny, y_list, eps_lists[i])
+                    for j in range(-Ny, Ny + 1)
+                ]
             )
         )
+        for i in range(nx)
+    ]
     F = np.zeros((D, D), complex)
     mx = 4 * Nx + 1
     f = [inter_((i + 2 * Nx) % mx - 2 * Nx, x_list, f) for i in range(mx)]

@@ -125,17 +125,15 @@ class Layer:
         #        for i in range(self.D):
         #            EPS+=sub.fou(self.G[i][0],self.G[i][1],self.creator.x_list,self.creator.y_list,self.creator.eps_lists)*np.exp(-(0+2j)*np.pi*(self.G[i][0]*X+self.G[i][1]*Y))
         EPS = sum(
-            [
-                sub.fou(
-                    self.G[i][0],
-                    self.G[i][1],
-                    self.creator.x_list,
-                    self.creator.y_list,
-                    self.creator.eps_lists,
-                )
-                * np.exp((0 + 2j) * np.pi * (self.G[i][0] * X + self.G[i][1] * Y))
-                for i in range(self.D)
-            ]
+            sub.fou(
+                self.G[i][0],
+                self.G[i][1],
+                self.creator.x_list,
+                self.creator.y_list,
+                self.creator.eps_lists,
+            )
+            * np.exp((0 + 2j) * np.pi * (self.G[i][0] * X + self.G[i][1] * Y))
+            for i in range(self.D)
         )
         plt.figure()
         # plt.imshow(np.real(EPS),aspect='auto',extent=[-s*0.5,s*0.5,-self.Nyx*s*0.5,self.Nyx*s*0.5])
@@ -145,7 +143,7 @@ class Layer:
             origin="lower",
         )
         plt.colorbar()
-        if pdf == None:
+        if pdf is None:
             plt.show()
         elif isinstance(pdf, PdfPages):
             pdf.savefig()
@@ -165,11 +163,7 @@ class Layer:
             ey (float): relative width of the unmapped region in y direction. Default is 0 (no mapping)
             complex_transform (bool): False for real transform (default), True for complex one.
         """
-        if complex_transform:
-            transform_function = sub.fou_complex_t
-        else:
-            transform_function = sub.fou_t
-
+        transform_function = sub.fou_complex_t if complex_transform else sub.fou_t
         if ex != 0.0:
             self.TX = True
             self.ex = ex
@@ -272,11 +266,7 @@ class Layer:
         Args:
             ordered (bool): if True (default) the modes are ordered by decreasing effective index
         """
-        if ordered:
-            Neff = self.gamma[np.argsort(self.W)[::-1]]
-        else:
-            Neff = self.gamma
-        return Neff
+        return self.gamma[np.argsort(self.W)[::-1]] if ordered else self.gamma
 
     def mat_plot(self, name: str):
         """Plot the absolute values of the fourier trasnsform matrices
@@ -286,7 +276,7 @@ class Layer:
             N (int): number of points for plotting the epsilon
             s (float): number pf relicas of the cell to plot. Default is 1.
         """
-        with PdfPages(name + ".pdf") as save:
+        with PdfPages(f"{name}.pdf") as save:
             for attr in ["FOUP", "EPS1", "EPS2", "INV", "FX", "FY"]:
                 try:
                     to_plot = getattr(self, attr)
@@ -440,8 +430,7 @@ class Layer:
             "x": x,
             "y": y,
             "z": z,
-        }
-        field.update({comp: np.zeros_like(x, dtype=complex) for comp in components})
+        } | {comp: np.zeros_like(x, dtype=complex) for comp in components}
         for i, (uu, dd, n) in enumerate(zip(u, d, self.gamma)):
             if uu == 0.0 and dd == 0.0:
                 continue
@@ -586,10 +575,7 @@ class Layer:
             TYPE: DESCRIPTION.
 
         """
-        if ordered:
-            j = np.argsort(self.W)[-i - 1]
-        else:
-            j = i
+        j = np.argsort(self.W)[-i - 1] if ordered else i
         self.get_Poyinting_norm()
         return self.PP_norm[j, j].real * np.abs(u[j]) ** 2.0
 
@@ -660,8 +646,7 @@ class Layer:
         T12 = 0.5 * (T1 - T2)
         T21 = 0.5 * (T1 - T2)
         T22 = 0.5 * (T1 + T2)
-        T = np.vstack([np.hstack([T11, T12]), np.hstack([T21, T22])])
-        return T
+        return np.vstack([np.hstack([T11, T12]), np.hstack([T21, T22])])
 
     def T_prop(self, d: float) -> np.ndarray:
         """Build the propagation Transfer matrix of the layer
@@ -676,8 +661,7 @@ class Layer:
         I1 = np.diag(np.exp((0 + 1j) * self.k0 * self.gamma * d))
         I2 = np.diag(np.exp(-(0 + 1j) * self.k0 * self.gamma * d))
         I = np.zeros((2 * self.D, 2 * self.D), complex)
-        T = np.vstack([np.hstack([I1, I]), np.hstack([I, I2])])
-        return T
+        return np.vstack([np.hstack([I1, I]), np.hstack([I, I2])])
 
     # newer version, should be faster
     def interface(self, lay) -> S_matrix:
@@ -730,7 +714,7 @@ class Layer:
         """
         args = () if args is None else args
 
-        if Nyp == None:
+        if Nyp is None:
             if self.Ny == 0:
                 Nyp = 1
                 y = np.array([0.0])
@@ -764,8 +748,7 @@ class Layer:
             Estar[i] = FOUx[self.G[i][0], self.G[i][1]]
             Estar[i + self.NPW] = FOUy[self.G[i][0], self.G[i][1]]
 
-        u = linalg.solve(self.V, Estar)
-        return u
+        return linalg.solve(self.V, Estar)
 
     def create_input(self, dic: dict) -> np.ndarray:
         """Creates the array of modal coefficient using a dictionary as input

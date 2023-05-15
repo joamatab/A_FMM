@@ -44,8 +44,7 @@ def gauss_beam(r,z,w0,lam):
 
 def gaussian(X,Y,x0,y0,z0,thetax,thetay,w0,lam):
     (Z,R)=FULL_CONV(X,Y,x0,y0,z0,thetax,thetay)
-    G=gauss_beam(R,Z,w0,lam)
-    return G
+    return gauss_beam(R,Z,w0,lam)
 
 
 

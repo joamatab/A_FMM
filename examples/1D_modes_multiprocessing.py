@@ -11,8 +11,7 @@ from multiprocessing import Pool
 def proc(k0):
     st.solve(k0)                                       #Create the scattering matirx of structure
     st.bloch_modes()                                   #Solve for bloch modes
-    BK=st.Bk                                           #saving Block vectors
-    return BK    
+    return st.Bk    
 
 
 def func(x,om,n,U):                                    #defining fitting function

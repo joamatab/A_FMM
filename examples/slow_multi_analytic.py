@@ -11,8 +11,7 @@ import copy
 def proc(k0):                                          # function which calculates the bands for the given k0
     st.solve(k0)                                       #Create the scattering matirx of structure
     st.bloch_modes()                                   #Solve for Bloch modes
-    BK=st.Bk                                           #saving Bloch vectors
-    return BK    
+    return st.Bk    
 
 #Computational cell for the layer is assumed 1D, only NX is set. The supercell dimension is set by the s parameter. This gives the scale for wavevectors, since then coordinate transfomation is applied.
 
@@ -159,7 +158,6 @@ for i in range(1):                      # no iterations, one single calculation
     if abs(lam_t-lam_band)<0.001:
         quit()
     P=P*lam_t/lam_band                                     #defining new period for next tuning step
-pass                                                       #ends loop for tuning the period
 quit()
 
 

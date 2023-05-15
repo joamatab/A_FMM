@@ -124,10 +124,10 @@ class S_matrix:
             None.
 
         """
-        if i==None:
+        if i is None:
             S=np.vstack([np.hstack([self.S11,self.S12]),np.hstack([self.S21,self.S22])])
         else:
-            j=i if j==None else j
+            j = i if j is None else j
             S=np.vstack([np.hstack([self.S11[i,j],self.S12[i,j]]),np.hstack([self.S21[i,j],self.S22[i,j]])])
         print(S)
 

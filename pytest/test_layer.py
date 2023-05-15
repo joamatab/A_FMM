@@ -6,8 +6,7 @@ from A_FMM import Creator, Layer
 def create_layer_from_creator():
     cr = Creator()
     cr.rect(12.0, 2.0, 0.6, 0.3)
-    lay = Layer(5, 5, cr)
-    return lay
+    return Layer(5, 5, cr)
 
 def test_layer_creation():
     with open('pickles/test_layer_creation.pkl', 'rb') as pkl:

@@ -10,8 +10,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 def proc(k0):                                          # function which calculates the bands for the given k0
     st.solve(k0)                                       #Create the scattering matirx of structure
     st.bloch_modes()                                   #Solve for Bloch modes
-    BK=st.Bk                                           #saving Bloch vectors
-    return BK    
+    return st.Bk    
 
 #Computational cell for the layer is assumed 1D, only NX is set. The supercell dimension is set by the s parameter. This gives the scale for wavevectors, since then coordinate transfomation is applied.
 
